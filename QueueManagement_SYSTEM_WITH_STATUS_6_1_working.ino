@@ -51,12 +51,11 @@ const unsigned long UID_CACHE_TTL_MS = 2000;
 const uint8_t arrivalMACs[][6] = {
     
      //78:1C:3C:2D:A2:A4
-    {0x5C, 0x01, 0x3B, 0x97, 0x54, 0xB4},
-    {0x78, 0x42, 0x1C, 0x6C, 0xE4, 0x9C},  //00:4B:12:97:2E:A4
+    {0x5C, 0x01, 0x3B, 0x98, 0xDB, 0x04},
+    {0x78, 0x42, 0x1C, 0x6C, 0xE4, 0x9C}, 
+    {0x5C, 0x01, 0x3B, 0x97, 0x54, 0xB4}, //00:4B:12:97:2E:A4
     {0x78, 0x1C, 0x3C, 0xE6, 0x6C, 0xB8}, //78:1C:3C:E6:6C:B8
     {0x78, 0x1C, 0x3C, 0xE3, 0xAB, 0x30}, //78:1C:3C:E3:AB:30
-    {0x5C, 0x01, 0x3B, 0x98, 0xDB, 0x04}, //5C:01:3B:98:DB:04
-  //78:42:1C:6C:E4:9C
      {0x78, 0x1C, 0x3C, 0x2D, 0xA2, 0xA4},
     {0x00, 0x4B, 0x12, 0x97, 0x2E, 0xA4},
 };
@@ -84,6 +83,7 @@ SourceInfo identifySource(const uint8_t* mac);
 SourceInfo identifySource1(const uint8_t* mac);
 void handleDoctorRequest(const SourceInfo& source);
 String getUIDString(const uint8_t* uid, uint8_t size);
+
 void blinkLED(int pin) {
    //digitalWrite(BLUE_LED_PIN , LOW);
     digitalWrite(pin, HIGH);digitalWrite(BUZZER,HIGH ); 
@@ -160,7 +160,7 @@ void clearAllQueues() {
 }
 
 
-void processCardUnified(String uid, bool isLocalScan = true, int senderIndex = -1) {
+void processCardUnified(String uid, bool isLocalScan = true) {
     QueueEntry existing;
     DateTime now = rtc.now();
     char timeBuffer[25];
@@ -221,13 +221,14 @@ void processCardUnified(String uid, bool isLocalScan = true, int senderIndex = -
             }
         }
     } else {
+      
         // Non-master sends only to master if not the original sender
-        if (currentMasterIndex != senderIndex) {
+        //if (currentMasterIndex != senderIndex) {
             esp_now_send(arrivalMACs[currentMasterIndex], (uint8_t*)&item, sizeof(item));
             Serial.println("📤 Sent patient info to master only.");
-        } else {
-            Serial.println("🔄 Originated from master - no need to send back");
-        }
+        // } else {
+        //     Serial.println("🔄 Originated from master - no need to send back");
+        // }
     }
 
     printAllQueues();
