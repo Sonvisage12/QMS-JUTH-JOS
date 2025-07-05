@@ -47,7 +47,7 @@ int currentMasterIndex = 0;     // Index of the currently known master
 RTC_DS3231 rtc;
 bool isArrivalNode = false, isDoctorNode = false;
 std::map<String, unsigned long> recentUIDs;
-const unsigned long UID_CACHE_TTL_MS = 1500;
+const unsigned long UID_CACHE_TTL_MS = 2000;
 const uint8_t arrivalMACs[][6] = {
     
      //78:1C:3C:2D:A2:A4
@@ -215,7 +215,7 @@ void processCardUnified(String uid, bool isLocalScan = true, int senderIndex = -
         Serial.println("📢 Master broadcasting update (excluding sender)");
         for (int i = 0; i < numArrivalNodes; i++) {
             // Skip self and the sending node
-            if (i != myIndex && i != senderIndex) {
+            if (i != myIndex ) {//&& i != senderIndex
                 esp_now_send(arrivalMACs[i], (uint8_t*)&item, sizeof(item));
                 Serial.printf("  ↳ Sent to node %d\n", i);
             }
